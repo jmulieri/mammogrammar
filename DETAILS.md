@@ -5,6 +5,7 @@
 1. added rspec and shoulda support
 1. generated Facility model
 1. TDD Facility model
+1. TDD FDAFacilityImporter
 
 ###Issues Encountered
 1. ActiveRecord::NoEnvironmentInSchemaError
