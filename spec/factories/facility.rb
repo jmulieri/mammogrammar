@@ -8,4 +8,9 @@ FactoryBot.define do
     phone { Faker::PhoneNumber }
     fax { Faker::PhoneNumber }
   end
+
+  factory :facility_with_latlng, parent: :facility do
+    lat { Faker::Address.latitude }
+    lng { Faker::Address.longitude }
+  end
 end

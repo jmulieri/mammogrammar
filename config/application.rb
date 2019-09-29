@@ -34,5 +34,6 @@ module Mammogrammar
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     config.x_auth_token = '753574ac-c6aa-4c7e-813e-337c58c70031'
+    config.active_job.queue_adapter = :sidekiq
   end
 end
