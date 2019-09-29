@@ -11,7 +11,7 @@ RSpec.describe 'Facilities API', type: :request do
     end
     zip
   end
-  let(:headers) { { 'X-AUTH-TOKEN' => '8f30acc1-e21e-45a8-b9d2-5fb77c933a8f' } }
+  let(:headers) { { 'X-AUTH-TOKEN' => Rails.configuration.x_auth_token } }
   let(:invalid_auth_headers) { { 'X-AUTH-TOKEN' => '4dffaa0b-eddf-4f66-b5c5-3e6e119f1bb6' } }
 
   describe 'GET /search/:zip_code' do
