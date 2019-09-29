@@ -43,6 +43,7 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
+  config.x_auth_token = '8f30acc1-e21e-45a8-b9d2-5fb77c933a8f'
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
 end
