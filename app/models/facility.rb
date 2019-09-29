@@ -1,4 +1,8 @@
+require 'geocoder/stores/active_record'
+
 class Facility < ApplicationRecord
+  include Geocoder::Store::ActiveRecord
+
   validates_presence_of :name, :address_1, :city, :state, :zip_code
   after_save :enqueue_geolocate_job, if: :requires_geocoding?
 
