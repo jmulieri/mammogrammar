@@ -9,8 +9,26 @@ class FDAFacilityImporter
   end
 
   def import
+    ids_to_keep = []
+    rows_to_import = []
     parse_contents(extract_contents(fetch_zip)).each do |row|
-      create_facility(row)
+      facility = find_facility(row)
+      if facility
+        ids_to_keep << facility.id
+      else
+        rows_to_import << row
+      end
+    end
+    # get ids of all facilities that were not an exact match
+    ids_to_delete = Facility.select(:id).map(&:id) - ids_to_keep
+
+    # delete all rows that are either no longer present or have changed
+    # there is no definitive way of knowing if a facility has simply changed location,
+    # just assume if we don't have it currently, that it is a new one, and also assume
+    # any facilities that we have that are not in the feed should be removed
+    Facility.where(id: ids_to_delete).delete_all
+    rows_to_import.each do |row|
+     create_facility(row)
     end
   end
 
@@ -37,6 +55,20 @@ class FDAFacilityImporter
 
   def parse_contents(contents)
     CSV.parse(contents, :col_sep => '|')
+  end
+
+  def find_facility(fields)
+    Facility.where(
+        name:      fields[0],
+        address_1: fields[1],
+        address_2: fields[2],
+        address_3: fields[3],
+        city:      fields[4],
+        state:     fields[5],
+        zip_code:  fields[6],
+        phone:     fields[7],
+        fax:       fields[8]
+    ).first
   end
 
   def create_facility(fields)

@@ -86,5 +86,75 @@ RSpec.describe FDAFacilityImporter do
       FDAFacilityImporter.import
       expect(Facility.count).to eq(3)
     end
+
+    it 'should not re-import existing Facilities' do
+      FDAFacilityImporter.import
+      expect(Facility.count).to eq(3)
+      FDAFacilityImporter.import
+      expect(Facility.count).to eq(3)
+    end
+
+    context 'with a lesser feed' do
+      let(:less_rows) { [row1, row2] }
+      let(:less_contents) { less_rows.map { |r| r.join('|') }.join("\n") }
+      let(:less_zip) do
+        os = StringIO.new
+        os.set_encoding Encoding::ASCII_8BIT
+        Zip::OutputStream.write_buffer(os) do |z|
+          z.put_next_entry('public.txt')
+          z.write(less_contents)
+        end
+        os.rewind
+        os.read
+      end
+      let(:less_zip_buffer) { StringIO.new(less_zip) }
+      let(:less_response_body) { less_zip }
+      let(:less_response) { instance_double(HTTParty::Response, body: less_response_body) }
+
+      it 'should delete Facilities that are not present in feed' do
+        FDAFacilityImporter.import
+        expect(Facility.count).to eq(3)
+        allow(HTTParty).to receive(:get).and_return(less_response)
+        FDAFacilityImporter.import
+        expect(Facility.count).to eq(2)
+        expect(Facility.select(:name).map(&:name)).to eq([row1[0], row2[0]])
+      end
+    end
+
+    context 'with a lesser feed also containing new facilities' do
+      let(:row4) { ['Bar Bar', 'Unit 5024', nil, nil, 'APO', 'AP', '96319-5300', '813117776602', '8117677'] }
+      let(:less_rows) { [row1, row2, row4] }
+      let(:less_contents) { less_rows.map { |r| r.join('|') }.join("\n") }
+      let(:less_zip) do
+        os = StringIO.new
+        os.set_encoding Encoding::ASCII_8BIT
+        Zip::OutputStream.write_buffer(os) do |z|
+          z.put_next_entry('public.txt')
+          z.write(less_contents)
+        end
+        os.rewind
+        os.read
+      end
+      let(:less_zip_buffer) { StringIO.new(less_zip) }
+      let(:less_response_body) { less_zip }
+      let(:less_response) { instance_double(HTTParty::Response, body: less_response_body) }
+
+      it 'should delete Facilities that are not present in feed' do
+        FDAFacilityImporter.import
+        expect(Facility.count).to eq(3)
+        expect(Facility.select(:name).map(&:name)).to eq([row1[0], row2[0], row3[0]])
+        ids_after_first_import = Facility.select(:id).map(&:id)
+
+        # import again with new feed, should delete one and create one
+        allow(HTTParty).to receive(:get).and_return(less_response)
+        FDAFacilityImporter.import
+        expect(Facility.count).to eq(3)
+        expect(Facility.select(:name).map(&:name)).to eq([row1[0], row2[0], row4[0]])
+
+        # check that we preserved the original 2 common records by ensuring the ids still exist
+        remaining_ids = Facility.where(id: ids_after_first_import).select(:id).map(&:id)
+        expect(remaining_ids.count).to eq(2)
+      end
+    end
   end
 end
