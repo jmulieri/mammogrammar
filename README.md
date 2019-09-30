@@ -21,3 +21,20 @@ by zip code. Here is are the steps to get up and running:
 `bundle exec sidekiq`
 1. import the facilities from the FDA website\
 `rake import_fda_facilities`
+1. start up the server
+`bundle exec rails s`
+1. test it out
+```bash
+# search by zip
+curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3000/search/95531"
+
+# search by zip prefix
+curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3000/search/955"
+
+# search by location(zip) and radius
+curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3000/near?location=96003&radius=99"
+
+# search by location(800 E Washington Blvd, Crescent City, CA 95531) and radius
+curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3000/near?location=800%20E%20Washington%20Blvd%2C%20Crescent%20City%2C%20CA%2095531&radius=1"
+```
+
