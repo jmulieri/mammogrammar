@@ -31,10 +31,10 @@ curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3
 # search by zip prefix
 curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3000/search/955"
 
-# search by location(zip) and radius
+# search by location(zip) and radius specified in miles
 curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3000/near?location=96003&radius=99"
 
-# search by location(800 E Washington Blvd, Crescent City, CA 95531) and radius
+# search by location(800 E Washington Blvd, Crescent City, CA 95531) and radius specified in miles
 curl -H 'X-AUTH-TOKEN: 753574ac-c6aa-4c7e-813e-337c58c70031' "http://localhost:3000/near?location=800%20E%20Washington%20Blvd%2C%20Crescent%20City%2C%20CA%2095531&radius=1"
 ```
 
